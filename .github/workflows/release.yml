@@ -8,7 +8,7 @@ on:
       - "v*.*.*"
 env:
   REGISTRY: ghcr.io
-  REGISTRY_IMAGE: ghcr.io/marthydavid/supermicro-letsencrypt
+  REGISTRY_IMAGE: ghcr.io/rmasters270/supermicro-letsencrypt
 
 
 jobs:
@@ -65,7 +65,7 @@ jobs:
 #        with:
 #          image: ${{ steps.meta.outputs.tags }}
 #          dockerfile: ./Dockerfile
-#          
+#
 #      - name: Upload SARIF file
 #        if: ${{ steps.scan.outputs.sarif != '' }}
 #        uses: github/codeql-action/upload-sarif@v2
