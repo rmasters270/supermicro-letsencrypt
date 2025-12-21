@@ -52,9 +52,9 @@ fi
 
 # Sign the request and obtain a certificate
 if [ -f ".lego/certificates/${IPMI_DOMAIN}.crt" ]; then
-    /lego --key-type rsa2048 --server ${LE_SERVER-https://acme-v02.api.letsencrypt.org/directory} --email ${LE_EMAIL} --dns ${DNS_PROVIDER:-route53} --accept-tos --domains ${IPMI_DOMAIN} renew
+    /lego --key-type rsa2048 --server "${LE_SERVER-https://acme-v02.api.letsencrypt.org/directory}" --email "${LE_EMAIL}" --dns "${DNS_PROVIDER:-route53}" --accept-tos --domains "${IPMI_DOMAIN}" renew
 else
-    /lego --key-type rsa2048 --server ${LE_SERVER-https://acme-v02.api.letsencrypt.org/directory} --email ${LE_EMAIL} --dns ${DNS_PROVIDER:-route53} --accept-tos --domains ${IPMI_DOMAIN} run
+    /lego --key-type rsa2048 --server "${LE_SERVER-https://acme-v02.api.letsencrypt.org/directory}" --email "${LE_EMAIL}" --dns "${DNS_PROVIDER:-route53}" --accept-tos --domains "${IPMI_DOMAIN}" run
 fi
 
 { set +x; } 2>/dev/null
