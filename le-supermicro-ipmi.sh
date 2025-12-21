@@ -22,8 +22,12 @@ if [ -z ${LE_EMAIL+x} ]; then
         exit 1
 fi
 
+PASSWORD_DISPLAY="******"
+[[ -z "${IPMI_PASSWORD}" ]] && PASSWORD_DISPLAY="<empty>"
 
-FORCE_UPDATE="false"
+if [ -z ${FORCE_UPDATE+x} ]; then
+        FORCE_UPDATE="false"
+fi
 
 force_update() {
   if [ "${FORCE_UPDATE}" == "true" ]; then
@@ -48,9 +52,21 @@ fi
 
 # Sign the request and obtain a certificate
 if [ -f ".lego/certificates/${IPMI_DOMAIN}.crt" ]; then
-    /lego --key-type rsa2048 --server ${LE_SERVER-https://acme-v02.api.letsencrypt.org/directory} --email ${LE_EMAIL} --dns ${DNS_PROVIDER:-route53} --accept-tos --domains ${IPMI_DOMAIN} renew
+    /lego --key-type rsa2048 --server "${LE_SERVER-https://acme-v02.api.letsencrypt.org/directory}" --email "${LE_EMAIL}" --dns "${DNS_PROVIDER:-route53}" --accept-tos --domains "${IPMI_DOMAIN}" renew
 else
-    /lego --key-type rsa2048 --server ${LE_SERVER-https://acme-v02.api.letsencrypt.org/directory} --email ${LE_EMAIL} --dns ${DNS_PROVIDER:-route53} --accept-tos --domains ${IPMI_DOMAIN} run
+    /lego --key-type rsa2048 --server "${LE_SERVER-https://acme-v02.api.letsencrypt.org/directory}" --email "${LE_EMAIL}" --dns "${DNS_PROVIDER:-route53}" --accept-tos --domains "${IPMI_DOMAIN}" run
 fi
 
-python3 supermicro-ipmi-updater.py --ipmi-url https://${IPMI_DOMAIN} --cert-file .lego/certificates/${IPMI_DOMAIN}.crt --key-file .lego/certificates/${IPMI_DOMAIN}.key --username ${IPMI_USERNAME} --password ${IPMI_PASSWORD} --model ${MODEL:-X11} $(force_update)
+{ set +x; } 2>/dev/null
+printf '%s ' \
+  python3 supermicro-ipmi-updater.py --ipmi-url "https://${IPMI_DOMAIN}" \
+  --cert-file ".lego/certificates/${IPMI_DOMAIN}.crt" --key-file ".lego/certificates/${IPMI_DOMAIN}.key" \
+  --username "${IPMI_USERNAME}" --password "${PASSWORD_DISPLAY}" \
+  --model "${MODEL:-X11}" "$(force_update)"
+echo
+
+python3 supermicro-ipmi-updater.py --ipmi-url "https://${IPMI_DOMAIN}" \
+  --cert-file ".lego/certificates/${IPMI_DOMAIN}.crt" --key-file ".lego/certificates/${IPMI_DOMAIN}.key" \
+  --username "${IPMI_USERNAME}" --password "${IPMI_PASSWORD}" \
+  --model "${MODEL:-X11}" "$(force_update)"
+set -x
