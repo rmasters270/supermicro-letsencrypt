@@ -58,7 +58,7 @@ class IPMIUpdater:
             return self._csrf_token
 
         page_url = self.url_redirect_template % url_name
-        result = self.session.get(page_url)
+        result = self.session.get(page_url, verify=False)
         result.raise_for_status()
 
         match = re.search(r'SmcCsrfInsert\s*\("CSRF_TOKEN",\s*"([^"]*)"\);', result.text)
