@@ -8,8 +8,14 @@ USER 1000
 
 WORKDIR /home/lego
 
-ADD le-supermicro-ipmi.sh supermicro-ipmi-updater.py requirements.txt /home/lego/
+ADD entrypoint.sh le-supermicro-ipmi.sh supermicro-ipmi-updater.py /home/lego/
 
-#RUN pip install -r requirements.txt
+ENTRYPOINT ["/home/lego/entrypoint.sh"]
 
-ENTRYPOINT ["/home/lego/le-supermicro-ipmi.sh"]
+HEALTHCHECK \
+  --interval=1h \
+  --timeout=10s \
+  --retries=3 \
+  --start-period=2m \
+  CMD test -f /tmp/last-run && \
+      [ $(( $(date +%s) - $(cat /tmp/last-run) )) -lt 900000 ] || exit 1

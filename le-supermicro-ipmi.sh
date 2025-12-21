@@ -1,33 +1,25 @@
 #!/usr/bin/env bash
 set -e
 
-if ! [ -z ${DEBUG+x} ]; then
-	set -x
-fi
+set_env_var() {
+  local var="$1"
+  local file_var="${var}_FILE"
 
-if [ -z ${IPMI_USERNAME+x} ]; then
-        echo "IPMI_USERNAME not set!"
-        exit 1
-fi
-if [ -z ${IPMI_PASSWORD+x} ]; then
-        echo "IPMI_PASSWORD not set!"
-        exit 1
-fi
-if [ -z ${IPMI_DOMAIN+x} ]; then
-        echo "IPMI_DOMAIN not set!"
-        exit 1
-fi
-if [ -z ${LE_EMAIL+x} ]; then
-        echo "LE_EMAIL not set!"
-        exit 1
-fi
+  # Load from file if present (takes precedence)
+  if [[ -n "${!file_var:-}" ]]; then
+    if [[ ! -r "${!file_var}" ]]; then
+      echo "Error: ${file_var} is set but file is not readable" >&2
+      exit 1
+    fi
+    export "$var"="$(tr -d '\r\n' < "${!file_var}")"
+  fi
 
-PASSWORD_DISPLAY="******"
-[[ -z "${IPMI_PASSWORD}" ]] && PASSWORD_DISPLAY="<empty>"
-
-if [ -z ${FORCE_UPDATE+x} ]; then
-        FORCE_UPDATE="false"
-fi
+  # Final validation
+  if [[ -z "${!var:-}" ]]; then
+    echo "Error: $var is not set" >&2
+    exit 1
+  fi
+}
 
 force_update() {
   if [ "${FORCE_UPDATE}" == "true" ]; then
@@ -41,6 +33,22 @@ check_ssl_expiry() {
     timeout 5 echo | openssl s_client -servername "${IPMI_DOMAIN}" -connect "${IPMI_DOMAIN}":443 2>/dev/null | openssl x509 -noout -checkend 2592000
     return $?
 }
+
+set_env_var "IPMI_USERNAME"
+set_env_var "IPMI_PASSWORD"
+set_env_var "IPMI_DOMAIN"
+set_env_var "LE_EMAIL"
+
+PASSWORD_DISPLAY="******"
+[[ -z "${IPMI_PASSWORD}" ]] && PASSWORD_DISPLAY="<empty>"
+
+if ! [ -z ${DEBUG+x} ]; then
+	set -x
+fi
+
+if [ -z ${FORCE_UPDATE+x} ]; then
+        FORCE_UPDATE="false"
+fi
 
 # Check certificate expiry or force_update flag
 if ! check_ssl_expiry || [ "${FORCE_UPDATE}" == "true" ]; then
