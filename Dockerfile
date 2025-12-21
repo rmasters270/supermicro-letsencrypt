@@ -8,8 +8,6 @@ USER 1000
 
 WORKDIR /home/lego
 
-ADD le-supermicro-ipmi.sh supermicro-ipmi-updater.py requirements.txt /home/lego/
+ADD entrypoint.sh le-supermicro-ipmi.sh supermicro-ipmi-updater.py /home/lego/
 
-#RUN pip install -r requirements.txt
-
-ENTRYPOINT ["/home/lego/le-supermicro-ipmi.sh"]
+ENTRYPOINT ["/home/lego/entrypoint.sh"]
