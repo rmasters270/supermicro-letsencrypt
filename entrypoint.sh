@@ -2,7 +2,6 @@
 set -euo pipefail
 
 MAIN_SCRIPT="/home/lego/le-supermicro-ipmi.sh"
-HEALTH_FILE="/tmp/last-run"
 STOP=false
 SECONDS_PER_DAY=86400
 
@@ -11,7 +10,6 @@ trap 'STOP=true' SIGTERM SIGINT
 run_once() {
   echo "[entrypoint] Running once"
   exec "$MAIN_SCRIPT"
-  date +%s > "$HEALTH_FILE"
 }
 
 print_interval() {
@@ -42,7 +40,6 @@ sleep_loop() {
 
   while true; do
     "$MAIN_SCRIPT"
-    date +%s > "$HEALTH_FILE"
 
     if $STOP; then
       echo "[entrypoint] Received shutdown signal, exiting"

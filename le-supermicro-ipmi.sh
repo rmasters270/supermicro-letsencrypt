@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
+HEALTH_FILE="/tmp/last-run"
+
 set_env_var() {
   local var="$1"
   local file_var="${var}_FILE"
@@ -55,6 +57,7 @@ if ! check_ssl_expiry || [ "${FORCE_UPDATE}" == "true" ]; then
     echo "Certificate is expiring within 30 days or FORCE_UPDATE is true. Renewing the certificate..."
 else
     echo "Certificate is valid and FORCE_UPDATE is false. No need to renew."
+    date +%s > "$HEALTH_FILE"
     exit 0
 fi
 
@@ -78,3 +81,5 @@ python3 supermicro-ipmi-updater.py --ipmi-url "https://${IPMI_DOMAIN}" \
   --username "${IPMI_USERNAME}" --password "${IPMI_PASSWORD}" \
   --model "${MODEL:-X11}" "$(force_update)"
 set -x
+
+date +%s > "$HEALTH_FILE"
