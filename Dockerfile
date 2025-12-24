@@ -1,5 +1,5 @@
 # Builder: download supercronic
-FROM alpine:3.20 AS supercronic
+FROM alpine:3.23 AS supercronic
 
 ARG SUPERCRONIC_VERSION=v0.2.41
 
@@ -11,7 +11,7 @@ RUN apk add --no-cache curl \
 
 
 # Runtime: lego
-FROM goacme/lego:v4.25.2
+FROM goacme/lego:v4.30.1
 
 COPY --from=supercronic /supercronic /usr/local/bin/supercronic
 
