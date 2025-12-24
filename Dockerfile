@@ -1,14 +1,31 @@
+# Builder: download supercronic
+FROM alpine:3.20 AS supercronic
+
+ARG SUPERCRONIC_VERSION=v0.2.41
+
+RUN apk add --no-cache curl \
+ && curl -fsSL \
+    https://github.com/aptible/supercronic/releases/download/${SUPERCRONIC_VERSION}/supercronic-linux-amd64 \
+    -o /supercronic \
+ && chmod +x /supercronic
+
+
+# Runtime: lego
 FROM goacme/lego:v4.25.2
+
+COPY --from=supercronic /supercronic /usr/local/bin/supercronic
+
 RUN apk add --no-cache ca-certificates bash openssl python3-dev py3-pip py3-openssl py3-lxml py3-requests py3-urllib3 \
     && adduser -u 1000 -D  lego \
     && mkdir -p /home/lego/.lego \
     && chown -R 1000:1000 /home/lego
 
+ADD entrypoint.sh le-supermicro-ipmi.sh supermicro-ipmi-updater.py /home/lego/
+RUN chmod +x /home/lego/entrypoint.sh /home/lego/le-supermicro-ipmi.sh
+
 USER 1000
 
 WORKDIR /home/lego
-
-ADD entrypoint.sh le-supermicro-ipmi.sh supermicro-ipmi-updater.py /home/lego/
 
 ENTRYPOINT ["/home/lego/entrypoint.sh"]
 
