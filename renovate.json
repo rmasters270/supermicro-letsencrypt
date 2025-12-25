@@ -34,16 +34,15 @@
       "automerge": true,
       "automergeType": "pr",
       "matchUpdateTypes": ["patch", "minor"]
-    },
+    }
+  ],
+  "regexManagers": [
     {
-      "description": "Update supercronic version",
-      "matchManagers": ["dockerfile"],
-      "matchDatasources": ["github-releases"],
-      "matchPackageNames": ["aptible/supercronic"],
-      "matchCurrentVersion": "^v[0-9]+\\.[0-9]+\\.[0-9]+$",
-      "automerge": true,
-      "automergeType": "pr",
-      "matchUpdateTypes": ["patch", "minor", "major"]
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": ["ARG SUPERCRONIC_VERSION=(?<currentValue>v[0-9]+\\.[0-9]+\\.[0-9]+)"],
+      "datasourceTemplate": "github-releases",
+      "packageNameTemplate": "aptible/supercronic",
+      "versioningTemplate": "semver"
     }
   ]
 }
