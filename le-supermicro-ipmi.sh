@@ -23,11 +23,10 @@ set_env_var() {
   fi
 }
 
-force_update() {
-    if [ "${FORCE_UPDATE}" == "true" ]; then
-        echo --force-update
-    fi
-}
+EXTRA_ARG=""
+if [ "${FORCE_UPDATE}" == "true" ]; then
+        EXTRA_ARG="--force-update"
+fi
 
 # Function to check SSL certificate expiry
 check_ssl_expiry() {
@@ -76,13 +75,13 @@ printf '%s ' \
     python3 supermicro-ipmi-updater.py --ipmi-url "https://${IPMI_DOMAIN}" \
     --cert-file ".lego/certificates/${IPMI_DOMAIN}.crt" --key-file ".lego/certificates/${IPMI_DOMAIN}.key" \
     --username "${IPMI_USERNAME}" --password "${PASSWORD_DISPLAY}" \
-    --model "${MODEL:-X11}" "$(force_update)"
+    --model "${MODEL:-X11}" "${EXTRA_ARG}"
 echo
 
 python3 supermicro-ipmi-updater.py --ipmi-url "https://${IPMI_DOMAIN}" \
     --cert-file ".lego/certificates/${IPMI_DOMAIN}.crt" --key-file ".lego/certificates/${IPMI_DOMAIN}.key" \
     --username "${IPMI_USERNAME}" --password "${IPMI_PASSWORD}" \
-    --model "${MODEL:-X11}" "$(force_update)"
+    --model "${MODEL:-X11}" "${EXTRA_ARG}"
 set -x
 
 date +%s > "$HEALTH_FILE"
