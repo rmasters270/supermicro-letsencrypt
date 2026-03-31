@@ -75,13 +75,13 @@ printf '%s ' \
     python3 supermicro-ipmi-updater.py --ipmi-url "https://${IPMI_DOMAIN}" \
     --cert-file ".lego/certificates/${IPMI_DOMAIN}.crt" --key-file ".lego/certificates/${IPMI_DOMAIN}.key" \
     --username "${IPMI_USERNAME}" --password "${PASSWORD_DISPLAY}" \
-    --model "${MODEL:-X11}" "${EXTRA_ARG}"
+    --model "${MODEL:-X11}" ${EXTRA_ARG}
 echo
 
 python3 supermicro-ipmi-updater.py --ipmi-url "https://${IPMI_DOMAIN}" \
     --cert-file ".lego/certificates/${IPMI_DOMAIN}.crt" --key-file ".lego/certificates/${IPMI_DOMAIN}.key" \
     --username "${IPMI_USERNAME}" --password "${IPMI_PASSWORD}" \
-    --model "${MODEL:-X11}" "${EXTRA_ARG}"
+    --model "${MODEL:-X11}" ${EXTRA_ARG}
 set -x
 
 date +%s > "$HEALTH_FILE"
